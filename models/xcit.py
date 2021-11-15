@@ -19,11 +19,11 @@ import torch
 import torch.nn as nn
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
-from .helpers import build_model_with_cfg
-from .vision_transformer import _cfg, Mlp
-from .registry import register_model
-from .layers import DropPath, trunc_normal_, to_2tuple
-from .cait import ClassAttn
+from timm.models.helpers import build_model_with_cfg
+from timm.models.vision_transformer import _cfg, Mlp
+from timm.models.registry import register_model
+from timm.models.layers import DropPath, trunc_normal_, to_2tuple
+from timm.models.cait import ClassAttn
 
 
 def _cfg(url='', **kwargs):
