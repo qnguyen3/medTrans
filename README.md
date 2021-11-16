@@ -16,7 +16,7 @@
 ```
 pip install requirements.txt
 #test with cifar 10
-python test.py --arch [config_names] --pretrained --num_classes 10
-# for example, fine-tune with cifar 10 on vision_transformer
-python test.py --arch vit_tiny_patch16_224 --pretrained --num_classes 10 --finetune
+python test.py --arch [config_names] --pretrained --num_classes 10 --epoch [epochs_num]
+# for example, fine-tune with cifar 10 on vision_transformer in 10 epochs
+python test.py --arch vit_tiny_patch16_224 --pretrained --num_classes 10 --finetune --epoch 10
 ```

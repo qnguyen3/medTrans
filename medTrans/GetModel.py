@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torchmetrics
 
+
 import sys
 
 class GetModel(LightningModule):
@@ -13,7 +14,7 @@ class GetModel(LightningModule):
                 pretrained: bool,
                 learning_rate: float,
                 optimizer: str = 'sgd',
-                fine_tune: bool = False,
+                fine_tune: bool = True,
                 loss_function: nn.Module = nn.CrossEntropyLoss(),
                 num_classes: int = 1000,
                  **kwargs) -> None:
@@ -28,6 +29,13 @@ class GetModel(LightningModule):
 
         self.fine_tune = fine_tune
         self.model = self.init_model(arch=arch, pretrained=pretrained, num_classes=num_classes)
+        if fine_tune:
+            self.model.eval()
+            for param in self.model.parameters():
+                param.requires_grad = False
+            for grad_param in self.model.head.parameters():
+                grad_param.requires_grad = True
+
         self.learning_rate = learning_rate
         self.optimizer = optimizer
         self.loss_function = loss_function
@@ -39,14 +47,12 @@ class GetModel(LightningModule):
     def forward(self, x):
         if self.representation:
             return self.model.forward_features(x)
+        elif self.fine_tune:
+            x = self.model.forward(x)
+            return x
         else:
-            if self.fine_tune == True:
-                with torch.no_grad():
-                    x = self.model.forward_features(x)
-                return self.model.head(x)
-            else:
-                x = self.model(x)
-                return x
+            x = self.model(x)
+            return x
 
     def init_model(self, arch: str, num_classes: int, pretrained: bool):
         model = supervised.__dict__[arch](pretrained=pretrained, num_classes=num_classes)
@@ -83,6 +89,7 @@ class GetModel(LightningModule):
         x, y = batch
         predict = self(x)
         loss = self.loss_function(predict, y)
+        self.log('test_acc', self.accuracy(predict, y), prog_bar=True, on_step=False, on_epoch=True)
         self.log("test_loss", loss)
         return loss
 
