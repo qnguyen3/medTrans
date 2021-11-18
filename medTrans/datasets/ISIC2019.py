@@ -9,7 +9,7 @@ from torchvision import transforms
 import numpy as np
 import os
 import csv
-from utils import ISIC2019Dataset
+from .utils import ISIC2019Dataset
 
 class ISIC2019(pl.LightningDataModule):
     def __init__(self, data_dir: str = None, 
