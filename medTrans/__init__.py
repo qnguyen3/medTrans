@@ -1,2 +1,2 @@
 from .GetModel import *
-from .supervised import *
+from .models import *

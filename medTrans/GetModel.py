@@ -1,6 +1,7 @@
 import pytorch_lightning as pl
 from pytorch_lightning import LightningModule
-from .supervised import models as supervised
+from timm.models.registry import model_entrypoint
+import medTrans.models as models
 import torch
 import torch.nn as nn
 import torchmetrics
@@ -55,7 +56,7 @@ class GetModel(LightningModule):
             return x
 
     def init_model(self, arch: str, num_classes: int, pretrained: bool):
-        model = supervised.__dict__[arch](pretrained=pretrained, num_classes=num_classes)
+        model = models.__dict__[arch](pretrained=pretrained, num_classes=num_classes)
         return model
 
     def configure_optimizers(self, optimizer: str = 'sgd'):
