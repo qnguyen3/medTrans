@@ -12,6 +12,16 @@ import csv
 from .utils import ISIC2019Dataset
 
 class ISIC2019(pl.LightningDataModule):
+    """ISIC 2019 Dataset
+        Args:
+            train_transform: Transformation for train data
+            validation_transform: Transformation for validation data
+            test_transform: Transformation for test data
+            batch_size: Batch size (default: 1)
+            num_workers: num_workers for PyTorch DataLoader (default: 0)
+            seed: seed for reproducible purpose (default: 1)
+            image_size: image size for transformation (default: 224)
+    """
     def __init__(self, data_dir: str = None, 
                 train_transform: transforms = None,
                 validation_transform: transforms = None,
@@ -20,15 +30,6 @@ class ISIC2019(pl.LightningDataModule):
                 num_workers:int = 0,
                 seed:int = 1,
                 image_size: int = 224):
-        """
-        train_transform: torchvision.transforms - Transformation for train data
-        validation_transform: torchvision.transforms - Transformation for validation data
-        test_transform: torchvision.transforms - Transformation for test data
-        batch_size: int - Batch size (default: 1)
-        num_workers:int - num_workers for PyTorch DataLoader (default: 0)
-        seed:int - seed for reproducible purpose (default: 1)
-        image_size: int - image size for transformation (default: 224)
-        """
         super().__init__()
 
         # Check if dataset is downloaded
