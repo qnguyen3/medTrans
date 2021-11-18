@@ -66,11 +66,14 @@ class ISIC2019(pl.LightningDataModule):
 
 
         self.isic2019_train = ISIC2019Dataset(csv_file = os.path.join(self.data_dir, 
-                                        'train_isic2019.csv'), transforms=self.train_transform)
+                                            'train_isic2019.csv'),data_dir=self.data_dir,
+                                            transforms=self.train_transform)
         self.isic2019_val = ISIC2019Dataset(csv_file = os.path.join(self.data_dir, 
-                                        'val_isic2019.csv'), transforms=self.validation_transform)
+                                            'val_isic2019.csv'),data_dir=self.data_dir, 
+                                            transforms=self.validation_transform)
         self.isic2019_test = ISIC2019Dataset(csv_file = os.path.join(self.data_dir, 
-                                        'test_isic2019.csv'), transforms=self.test_transform)
+                                            'test_isic2019.csv'),data_dir=self.data_dir, 
+                                            transforms=self.test_transform)
 
     def prepare_data(self):
         """
