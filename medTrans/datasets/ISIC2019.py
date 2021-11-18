@@ -76,10 +76,12 @@ class ISIC2019(pl.LightningDataModule):
         """
         Prepare ISIC 2019 Data
         """
+        if os.path.exists(os.path.join(self.data_dir, 'train_isic2019.csv')):
+            print("Data is downloaded and verify")
         training_groundtruth_path = os.path.join(self.data_dir, 
                                                 'ISIC_2019_Training_GroundTruth.csv')
-        if not os.path.exists(os.path.join(self.data_dir, 'train_isic2019.csv')):
-            self.split_csv(file = training_groundtruth_path)
+        self.split_csv(file = training_groundtruth_path)
+            
 
     def train_dataloader(self):
         return DataLoader(self.isic2019_train, batch_size=self.batch_size, num_workers=self.num_workers)
