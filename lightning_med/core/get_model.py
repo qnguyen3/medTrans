@@ -1,7 +1,6 @@
 import pytorch_lightning as pl
 from pytorch_lightning import LightningModule
-from timm.models.registry import model_entrypoint
-import medTrans.models as models
+import lightning_med.models as models
 import torch
 import torch.nn as nn
 import torchmetrics
