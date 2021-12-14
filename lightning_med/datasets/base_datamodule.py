@@ -51,7 +51,7 @@ class BaseDataModule(pl.LightningDataModule):
         return super().val_dataloader(*args, **kwargs)
 
 
-class BaseKFoldDataModule(LightningDataModule, ABC):
+class BaseKFoldDataModule(pl.LightningDataModule, ABC):
     @abstractmethod
     def setup_folds(self, num_folds: int) -> None:
         pass
