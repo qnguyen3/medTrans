@@ -2,14 +2,20 @@
 Adapted from https://github.com/StephenLouis/ISIC_2019/blob/master/Data_Loader.py
 with changes to support LightningDataModule
 '''
-
-import pytorch_lightning as pl
-from torch.utils.data import DataLoader
-from torchvision import transforms
-import numpy as np
+from dataclasses import dataclass
 import os
 import csv
-from .utils import ISIC2019Dataset
+
+import numpy as np
+import pytorch_lightning as pl
+from sklearn.model_selection import KFold
+from torch.utils.data.dataset import Subset
+from torch.utils.data import DataLoader
+from torchvision import transforms
+
+from .utils import ISIC2019Dataset, ISIC2019Dataset_CV
+from .base_datamodule import BaseKFoldDataModule
+
 
 class ISIC2019(pl.LightningDataModule):
     """ISIC 2019 Dataset
@@ -137,9 +143,82 @@ class ISIC2019(pl.LightningDataModule):
                 writer.writerows(np.array(data)[test_indices])
                 a_test.close()
 
+'''
+KFold Implementation
+References: https://github.com/PyTorchLightning/pytorch-lightning
+            /blob/2faaf35b91a00aff397609a875a66c87f8ed6390/pl_examples/loop_examples/kfold.py
+'''
+@dataclass
+class ISIC2019_CV(BaseKFoldDataModule):
+    def __init__(self, data_dir: str = None,
+                train_transform: transforms = None,
+                val_transform: transforms = None,
+                test_transform: transforms = None,
+                batch_size:int = 1,
+                num_workers:int = 0,
+                seed:int = 1,
+                image_size: int = 224):
+        super().__init__()
+
+        self.data_dir = data_dir
+
+        self.train_transform = train_transform
+        self.validation_transform = val_transform
+        self.test_transform = test_transform
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.seed = seed
+        self.image_size = image_size
+        self.train_fold = None
+        self.val_fold = None
+        
+
+    def prepare_data(self) -> None:
+        self.training_groundtruth_path = os.path.join(self.data_dir, 
+                                                'ISIC_2019_Training_GroundTruth.csv')
+        if os.path.exists(self.training_groundtruth_path):
+            print("Data is downloaded and verified")
+        else:
+            raise ValueError('Missing "ISIC_2019_Training_GroundTruth.csv". Make sure the data is downloaded correctly')
+        
+    def setup(self, stage=None):
+
+        if self.train_transform is None:
+            self.train_transform = transforms.Compose([transforms.Resize([self.image_size, self.image_size]),
+                                                            transforms.RandomHorizontalFlip(),
+                                                            transforms.ToTensor(),
+                                                            transforms.Normalize((0.6678, 0.5298, 0.5245), (0.1333, 0.1476, 0.1590))])
+        if self.validation_transform is None:
+            self.validation_transform = transforms.Compose([transforms.Resize([self.image_size, self.image_size]),
+                                                            transforms.ToTensor(),
+                                                            transforms.Normalize((0.6678, 0.5298, 0.5245), (0.1333, 0.1476, 0.1590))])
+        if self.test_transform is None:
+            self.test_transform = transforms.Compose([transforms.Resize([self.image_size, self.image_size]),
+                                                            transforms.ToTensor(),
+                                                            transforms.Normalize((0.6678, 0.5298, 0.5245), (0.1333, 0.1476, 0.1590))])
+
+        self.train_set = ISIC2019Dataset_CV(csv_file=self.training_groundtruth_path, data_dir=self.data_dir, 
+                                            transforms=self.train_transform)
+
+    def setup_folds(self, num_folds: int) -> None:
+        self.num_folds = num_folds
+        self.splits = [split for split in KFold(num_folds).split(range(len(self.train_dataset)))]
+
+    def setup_fold_index(self, fold_index: int) -> None:
+        train_indices, val_indices = self.splits[fold_index]
+        self.train_fold = Subset(self.train_set, train_indices)
+        self.val_fold = Subset(self.train_set, val_indices)
+
+    def train_dataloader(self) -> DataLoader:
+        return DataLoader(self.train_fold, batch_size=self.batch_size, num_workers=self.num_workers)
+
+    def val_dataloader(self) -> DataLoader:
+        return DataLoader(self.val_fold, batch_size=self.batch_size, num_workers=self.num_workers) 
+        
+
+
 
 
 
 
         
-

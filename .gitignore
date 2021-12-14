@@ -3,3 +3,5 @@ lightning_logs
 checkpoints
 *.pyc
 tempCodeRunnerFile.py
+*.ipynb
+*.csv

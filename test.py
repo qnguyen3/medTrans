@@ -1,7 +1,7 @@
 import argparse
 
 from pytorch_lightning import loggers
-from medTrans import GetModel
+import lightning_med as lm
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torchvision
@@ -36,7 +36,7 @@ def get_args_parser():
 
 def main(args):
     
-    model = GetModel(arch=args.arch, pretrained=args.pretrained, learning_rate=args.lr, num_classes=args.num_classes, fine_tune=args.finetune)
+    model = lm.GetModel(arch=args.arch, pretrained=args.pretrained, learning_rate=args.lr, num_classes=args.num_classes, fine_tune=args.finetune)
     print('finetune: {args.finetune}\n')
     print(model)
     count_parameters(model)
