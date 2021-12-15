@@ -202,7 +202,7 @@ class ISIC2019_CV(BaseKFoldDataModule):
 
     def setup_folds(self, num_folds: int) -> None:
         self.num_folds = num_folds
-        self.splits = [split for split in KFold(num_folds).split(range(len(self.train_dataset)))]
+        self.splits = [split for split in KFold(num_folds).split(range(len(self.train_set)))]
 
     def setup_fold_index(self, fold_index: int) -> None:
         train_indices, val_indices = self.splits[fold_index]

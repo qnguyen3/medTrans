@@ -162,7 +162,7 @@ class ISIC2019Dataset_CV(Dataset):
         self.transform = transforms
 
     def __len__(self):
-        return len(self.images)
+        return len(self.images_name)
 
     def __getitem__(self, index):
         image_name, target = self.images_name[index], self.targets[index]
